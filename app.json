@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "shopjee",
+    "slug": "shopjee",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FEF9B0"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.odelite.shopjee",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FEF9B0"
+      },
+      "package": "com.odelite.shopjee",
+      "versionCode": 1
+    },
+    "platforms": [
+      "android"
+      
+    ],
+    "description": "Your own shop",
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "logoPath": "./assets/logo.png" ,
+      "eas": {
+        "projectId": "8c7e792f-8f7b-4df2-b966-f8b9dd747614"
+      }
+    }
+  }
+}
