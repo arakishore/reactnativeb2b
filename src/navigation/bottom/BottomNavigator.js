@@ -82,7 +82,7 @@ const BottomNavigator = () => {
       tabBarInactiveTintColor: tabBarOptions.inactiveTintColor,
     })}>
       <Bottom.Screen
-        name="Screen1"
+        name="BottomCategoryProduct"
         component={CategoryProduct}
         options={{
           headerTitle: 'Home', // Set the title for the header

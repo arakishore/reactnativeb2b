@@ -7,17 +7,17 @@ import star from "../../assets/star";
 import open from "../../assets/open";
 
 import {
-  RestaurantCard,
-  RestaurantCardCover,
+  ProductListCard,
+  ProductListCardCover,
   Info,
   Section,
   SectionEnd,
   Rating,
   Icon,
   Address,
-} from "../components/restaurant-info-card.styles";
+} from "../components/product-info-card.styles";
 
-export const RestaurantInfoCard = ({ restaurant = {} }) => {
+export const ProdutListcard = ({ restaurant = {} }) => {
   const {
     name = "product Name",
    
@@ -32,12 +32,11 @@ export const RestaurantInfoCard = ({ restaurant = {} }) => {
   //const ratingArray = Array.from(new Array(Math.floor(rating)));
 
   return (
-    <RestaurantCard elevation={5}>
-      <RestaurantCardCover key={name} source={{ uri: photos[0] }} />
+    <ProductListCard elevation={5}>
+      <ProductListCardCover key={name} source={{ uri: photos[0] }} />
       <Info>
         <Text variant="label">{name}</Text>
         <Section>
-          
           <SectionEnd>
           <Text variant="error">Add to Cart</Text>
             
@@ -45,6 +44,6 @@ export const RestaurantInfoCard = ({ restaurant = {} }) => {
         </Section>
         <Address>{detail}</Address>
       </Info>
-    </RestaurantCard>
+    </ProductListCard>
   );
 };

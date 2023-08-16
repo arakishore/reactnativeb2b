@@ -9,6 +9,8 @@ import Splash from '../screens/Splash';
 import Dashboard from './Dashboard';
 import SearchScreen from '../screens/SearchScreen';
 import { LoginScreen, RegisterScreen, ResetPasswordScreen } from '../screens/login';
+import { Products } from '../screens/Products';
+ 
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +51,12 @@ const AppNavigator = () => {
                         component={SearchScreen}
                         options={{ headerShown: true }}
                     />
+                     {/* <Stack.Screen
+                        name="Products"
+                        component={Products}
+                        options={{ headerShown: true }}
+                    /> */}
+
                 </Stack.Navigator>
             </NavigationContainer>
         </Provider>

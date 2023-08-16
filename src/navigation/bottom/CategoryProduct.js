@@ -4,7 +4,8 @@ import {
   createStackNavigator,
   TransitionPresets,
 } from "@react-navigation/stack";
-import {Category} from "../../screens/Category";
+import {Products} from "../../screens/Products";
+import Category from "../../screens/Category";
 
 // import ProductDetail from '../../screens/ProductDetail';
 
@@ -19,9 +20,17 @@ export const CategoryProduct = () => {
         ...TransitionPresets.ModalPresentationIOS,
       }}
     >
-      <CategoryProductStack.Screen
+       {/* <CategoryProductStack.Screen
         name="Category"
         component={Category}
+      />   */}
+       <CategoryProductStack.Screen
+        name="Category"
+        component={Category}
+      /> 
+      <CategoryProductStack.Screen
+        name="Products"
+        component={Products}
       />
       {/* <CategoryProductStack.Screen
         name="ProductDetail"
