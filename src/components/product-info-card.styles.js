@@ -8,11 +8,14 @@ export const Icon = styled.Image`
 
 export const ProductListCard = styled(Card)`
   background-color: ${(props) => props.theme.colors.bg.primary};
+  padding: 4px;
 `;
 
 export const ProductListCardCover = styled(Card.Cover)`
-  padding: ${(props) => props.theme.space[2]};
+  padding: 4px;
   background-color: ${(props) => props.theme.colors.bg.primary};
+  justify-content: center;
+ 
 `;
 
 export const Address = styled.Text`
@@ -26,12 +29,15 @@ export const Info = styled.View`
  
 
 export const Section = styled.View`
-  flex-direction: row;
-  align-items: center;
+flex: 1;
+flex-direction: row;
+
+border:1px;
 `;
 
 export const SectionEnd = styled.View`
   flex: 1;
   flex-direction: row;
   justify-content: flex-end;
+  border:1px;
 `;

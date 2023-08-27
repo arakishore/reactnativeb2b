@@ -1,7 +1,8 @@
 import { View, Text } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native'
-import { Provider } from 'react-native-paper'
+import { Provider as PaperProvider } from 'react-native-paper';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { theme } from '../core/theme'
@@ -9,14 +10,30 @@ import Splash from '../screens/Splash';
 import Dashboard from './Dashboard';
 import SearchScreen from '../screens/SearchScreen';
 import { LoginScreen, RegisterScreen, ResetPasswordScreen } from '../screens/login';
-import { Products } from '../screens/Products';
- 
+//import { Products } from '../screens/Products';
+import {  useDispatch } from 'react-redux';
+import { fetchCategoriesAndProductsExtra  } from '../store/redux/slices/categorySlice';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import Category from '../screens/Category';
+import Products from '../screens/Products';
+
+
+const Drawer = createDrawerNavigator();
+
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
+    const dispatch = useDispatch();
+ 
+    useEffect(() => {
+        dispatch(fetchCategoriesAndProductsExtra());
+    }, [dispatch]);
+
+ 
+
     return (
-        <Provider theme={theme}>
+        <PaperProvider theme={theme}>
             <StatusBar />
             <NavigationContainer>
                 <Stack.Navigator>
@@ -47,11 +64,21 @@ const AppNavigator = () => {
                         options={{ headerShown: false }}
                     />
                     <Stack.Screen
+                        name="Category"
+                        component={Category}
+                        options={{ headerShown: false }}
+                    />
+                      <Stack.Screen
+                        name="Products"
+                        component={Products}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
                         name="SearchScreen"
                         component={SearchScreen}
                         options={{ headerShown: true }}
                     />
-                     {/* <Stack.Screen
+                    {/* <Stack.Screen
                         name="Products"
                         component={Products}
                         options={{ headerShown: true }}
@@ -59,7 +86,7 @@ const AppNavigator = () => {
 
                 </Stack.Navigator>
             </NavigationContainer>
-        </Provider>
+        </PaperProvider>
     );
 };
 

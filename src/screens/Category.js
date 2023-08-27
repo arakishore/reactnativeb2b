@@ -1,82 +1,148 @@
-import React, { useState } from 'react';
-import { Searchbar } from "react-native-paper";
-import { FlatList,TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import { Avatar, Button, Card } from 'react-native-paper';
+import React, { useEffect,useLayoutEffect  } from 'react';
+import { useSelector,useDispatch } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 
-import styled from "styled-components/native";
-import { SafeArea } from "../components/utility/safe-area.component";
+import { FlatList, TouchableOpacity, View, Text, Image, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { Card } from 'react-native-paper';
 
-import { Spacer } from "../components/spacer/spacer.component";
+ import FlatListStyles from "../components/FlatlistCss";
+import TextComponent from "../components/TextComponent";
+import { resetTitle } from '../store/redux/slices/titleSlice'; // Make sure the path is correct
 
 
-const CategoryList = styled(FlatList).attrs({
-  contentContainerStyle: {
-    padding: 16,
-  },
-})``;
+ 
 
 const Category = ({ navigation }) => {
-  const [data, setData] = useState([
-    { id: '1', name: 'Item 1' },
-    { id: '2', name: 'Item 2' },
-    { id: '3', name: 'Item 3' },
-    // ... more data
-  ]);
+  const dispatch = useDispatch();
+  const isFocused = useIsFocused();
+
+  const categories = useSelector(state => state.categoryReducer.categories);
+  
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     // This function will be called when the screen gains focus
+  //     console.log('Screen focused');
+  //     dispatch(resetTitle());
+
+  //     return () => {
+  //       // This function will be called when the screen loses focus
+  //       console.log('Screen unfocused');
+  //     };
+  //   }, [])
+  // );
+
+  useEffect(() => {
+    
+    if (isFocused) {
+      dispatch(resetTitle());
+    }
+    return () => {
+    //  console.log('Screen unfocused');
+    };
+     
+  }, [isFocused]);
 
   const renderItem = ({ item }) => (
-    
-    <Card style={styles.cardContainer}>
-      <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={styles.image} />
-      <Card.Title title="Card Title" />
+
+    <Card style={styles.flexItem}>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("Products", {
+            category_id: item.category_id,
+            category: item
+           
+          })
+        }
+        style={styles.elevationContainer}
+      >
+        <View >
+          {item.image != null && item.image != "" ? (
+            <Card.Cover
+              style={{ width: "auto", height: 80 }}
+              source={{ uri: item.image }}
+              onError={() => {
+                // Handle image load error, e.g., show a placeholder image
+                //console.log('Error loading image:', item.image);
+              }}
+            />
+          ) : (
+            <Card.Cover
+              style={{ width: "auto", height: 80 }}
+              source={require("../../assets/noimage.png")}
+              onError={() => {
+                // Handle image load error, e.g., show a placeholder image
+                //console.log('Error loading image:', item.image);
+              }}
+            />
+
+          )}
+
+        </View>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", justifyContent: "center", marginTop: 10 }}>
+          <TextComponent
+
+            label={item != null ? " " + item.cate_name_eng : "-"}
+            style={FlatListStyles.CardSubTitle}
+          />
+        </View>
+      </TouchableOpacity>
     </Card>
-    
+
   );
-
-
+   
 
   return (
-    <TouchableOpacity
-    onPress={() => navigation.navigate("Products")}
-    
-  >
-    <CategoryList
-      data={data}
-      renderItem={renderItem}
-      keyExtractor={item => item.id}
-      numColumns={2} // Renders as a grid with 2 columns
-      horizontal={false} // Renders as a vertical list (default behavior)
 
+    <FlatList
+      contentContainerStyle={styles.scrollViewContent}
+      data={categories}
+      renderItem={renderItem}
+      keyExtractor={item => item.category_id}
+
+      numColumns={2}
+      columnWrapperStyle={styles.flexContainer}
     />
-     </TouchableOpacity>
+
+
   );
 };
 
 
-export default Category;
-
 const styles = StyleSheet.create({
-  cardContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    borderWidth: 0,
-    borderColor: 'gray',
-    borderRadius: 8,
-    margin: 10,
-    elevation: 5
+  scrollViewContent: {
+    flexGrow: 1,
+    margin: 8,
+    paddingBottom:20
   },
-  column: {
-    flex: 1,
-    marginHorizontal: 5,
-    alignItems: 'center', // Center content horizontally
+  flexContainer: {
+    padding: 4,
+    alignContent:'stretch',
+    justifyContent: 'flex-start',
+    
   },
-  image: {
-    width: '100%',
-    height: 150, // Custom image height
-    borderRadius: 8,
-    marginBottom: 10,
+  flexItem: {
+    padding: 10,
+    width: '48%',
+    height: 150,
+    borderRadius: 5,
+    marginHorizontal: 4,
+    marginVertical: 1,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    justifyContent: 'space-evenly',
+    
+
+  },
+  text: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 48,
+    textAlign: 'center',
   },
 });
+
+export default Category;
+ 
