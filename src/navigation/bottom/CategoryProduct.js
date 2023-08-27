@@ -49,7 +49,7 @@ export const CategoryProduct = () => {
         name="ProductDetail"
         component={ProductDetail}
         options={({ route }) => ({
-          headerShown: true,
+          headerShown: false,
           headerMode :'screen',
            
         })}

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'; // Don't forget to import useState
-
-import {  useDispatch } from 'react-redux';
  
-import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
+import {  useDispatch } from 'react-redux';
+
+import { TouchableOpacity, View, Text, Image, StyleSheet ,ScrollView} from 'react-native';
 import FlatListStyles from "../components/FlatlistCss";
 import { Card,List, Divider } from 'react-native-paper';
 
@@ -17,6 +17,11 @@ const ProductDetail = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { prodId, categoryId, product } = route.params;
 
+  const [breakfastExpanded, setBreakfastExpanded] = useState(false);
+  const [lunchExpanded, setLunchExpanded] = useState(false);
+  const [dinnerExpanded, setDinnerExpanded] = useState(false);
+  const [drinksExpanded, setDrinksExpanded] = useState(false);
+
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
@@ -29,44 +34,85 @@ const ProductDetail = ({ navigation, route }) => {
     setModalVisible(false);
   };
   const {
-    prod_name = product.prod_name,
-    photos = product.prod_primary_image_path,
-    prod_code = product.prod_code,
+    brand_id = product.brand_id,
+    brand_name = product.brand_name,
+    cashback_amount = product.cashback_amount,
+     category_group_name = product.category_group_name,
+    category_id = product.category_id,
+    category_l1_id = product.category_l1_id,
+    category_l1_name = product.category_l1_name,
+    category_name = product.category_name,
+    cgst_perc = product.cgst_perc,
+    feature_value_fid = product.feature_value_fid,
+    igst_perc = product.igst_perc,
+    is_favourite = product.is_favourite,
+    is_fixed_packet = product.is_fixed_packet,
+    is_in_cart = product.is_in_cart,
     mimimum_qty = product.mimimum_qty,
+    packing_type = product.packing_type,
+    premium_delivery_charges = product.premium_delivery_charges,
+     
+    prod_code = product.prod_code,
+    prod_color_code = product.prod_color_code,
+    prod_desc_text = product.prod_desc_text,
+    prod_desc_text_guj = product.prod_desc_text_guj,
+    prod_desc_text_hindi = product.prod_desc_text_hindi,
+    prod_desc_text_marathi = product.prod_desc_text_marathi,
+    prod_feature_value = product.prod_feature_value,
+    prod_feature_value_fid = product.prod_feature_value_fid,
+    prod_group_id = product.prod_group_id,
+    prod_group_value_fid = product.prod_group_value_fid,
     prod_id = product.prod_id,
-    prod_unit = product.prod_unit,
+    prod_image_1_path = product.prod_image_1_path,
+    prod_image_2_path = product.prod_image_2_path,
+    prod_image_3_path = product.prod_image_3_path,
     prod_mrp = product.prod_mrp,
-    prod_selling_price = product.prod_selling_price,
+    prod_name = product.prod_name,
+    prod_name_guj = product.prod_name_guj,
+    prod_name_hindi = product.prod_name_hindi,
+    prod_name_marathi = product.prod_name_marathi,
     prod_pack_size = product.prod_pack_size,
     prod_primary_image_path = product.prod_primary_image_path,
-    category_id = product.category_id,
     prod_qty_stock = product.prod_qty_stock,
+    prod_rating_count = product.prod_rating_count,
+    prod_return_text = product.prod_return_text,
+    prod_return_text_guj = product.prod_return_text_guj,
+    prod_return_text_hindi = product.prod_return_text_hindi,
+    prod_return_text_marathi = product.prod_return_text_marathi,
     prod_savings = product.prod_savings,
-    is_fixed_packet = product.is_fixed_packet,
+    prod_selling_price = product.prod_selling_price,
+    prod_specification_text = product.prod_specification_text,
+    prod_specification_text_guj = product.prod_specification_text_guj,
+    prod_specification_text_hindi = product.prod_specification_text_hindi,
+    prod_specification_text_marathi = product.prod_specification_text_marathi,
+    prod_unit = product.prod_unit,
+    prod_warranty_text = product.prod_warranty_text,
+    prod_warranty_text_guj = product.prod_warranty_text_guj,
+    prod_warranty_text_hindi = product.prod_warranty_text_hindi,
+    prod_warranty_text_marathi = product.prod_warranty_text_marathi,
     product_base_unit = product.product_base_unit,
-    prod_desc_text = product.prod_desc_text,
-    packing_type = product.packing_type,
-    category_name = product.category_name,
+    rating_star = product.rating_star,
+    sgst_perc = product.sgst_perc,
+    shared_delivery_charges = product.shared_delivery_charges,
+    sub_category_id = product.sub_category_id,
     sub_category_name = product.sub_category_name,
-    brand_name = product.brand_name,
-    image = product.image,
-    discountpercentage = product.discountpercentage
+    vendor_id = product.vendor_id,
+    vendor_name = product.vendor_name,
+    
 
   } = product;
 
+ 
   const image_paths = [
     product.prod_image_1_path,
     product.prod_image_2_path,
     product.prod_image_3_path
   ];
-  console.log('image_paths1', image_paths);
+  //console.log('product', product);
   const handleAddToCart1 = () => {
     // You can use the product ID here
-
     // Add your cart logic here
   };
-
-   
 
   return (
     <Card style={styles.card}>
@@ -97,7 +143,7 @@ const ProductDetail = ({ navigation, route }) => {
           <Text style={styles.mrp} >MRP: <RuppeeIcon></RuppeeIcon>{prod_mrp}</Text>
           <Text style={styles.offerprice} >Our Offer: <RuppeeIcon></RuppeeIcon>{prod_selling_price}</Text>
           <Text style={styles.miniqty} >Mini Qty Box/Try: {mimimum_qty}</Text>
-          <Text style={styles.save} >Save: <RuppeeIcon></RuppeeIcon>{discountpercentage}</Text>
+          <Text style={styles.save} >Save: <RuppeeIcon></RuppeeIcon>{prod_savings}</Text>
         </View>
         <View style={styles.columnColRight}>
 
@@ -109,6 +155,62 @@ const ProductDetail = ({ navigation, route }) => {
 
         </View>
       </View>
+
+      <ScrollView>
+        <List.Accordion
+          title="Description"
+          left={(props) => <List.Icon {...props} icon="bread-slice" />}
+          expanded={breakfastExpanded}
+           onPress={() => setBreakfastExpanded(!breakfastExpanded)}
+           style={styles.accordion}
+           titleStyle={styles.titleStyle}
+           contentStyle={styles.contentStyle}
+        >
+          <Text style={styles.contentContainer}>aaaaaaa</Text>
+        </List.Accordion>
+        <Divider />
+        <List.Accordion
+          title="Specification"
+          left={(props) => <List.Icon {...props} icon="hamburger" />}
+          expanded={lunchExpanded}
+          onPress={() => setLunchExpanded(!lunchExpanded)}
+          style={styles.accordion}
+          titleStyle={styles.titleStyle}
+          contentStyle={styles.contentStyle}
+        >
+          <List.Item title="Burger w/ Fries" />
+          <Divider />
+          
+        </List.Accordion>
+        <Divider />
+        <List.Accordion
+          title="Warranty"
+          left={(props) => <List.Icon {...props} icon="food-variant" />}
+          expanded={dinnerExpanded}
+          onPress={() => setDinnerExpanded(!dinnerExpanded)}
+          style={styles.accordion}
+          titleStyle={styles.titleStyle}
+          contentStyle={styles.contentStyle}
+        >
+          <List.Item title="Spaghetti Bolognese" />
+         
+        </List.Accordion>
+        <Divider />
+
+        <List.Accordion
+          title="Returns"
+          left={(props) => <List.Icon {...props} icon="cup" />}
+          expanded={drinksExpanded}
+          onPress={() => setDrinksExpanded(!drinksExpanded)}
+          style={styles.accordion}
+          titleStyle={styles.titleStyle}
+          contentStyle={styles.contentStyle}
+        >
+          <List.Item title="Coffee" />
+          <Divider />
+          
+        </List.Accordion>
+      </ScrollView>
       <ImageModal
             visible={modalVisible}
             imagePath={selectedImage}
@@ -120,8 +222,26 @@ const ProductDetail = ({ navigation, route }) => {
 
 
 const styles = StyleSheet.create({
-  containerRow: {
+  accordion: {
+    backgroundColor: '#f0f0f0',
     
+    padding:0,
+    margin:0
+  },
+  titleStyle: {
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  contentStyle: {
+    padding: 4,
+  },
+  contentContainer: {
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    marginTop: 0,
+    paddingVertical: 10,
+  },
+  containerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 10,
