@@ -1,3 +1,7 @@
+import styled from "styled-components/native";
+import { Button } from "react-native-paper";
+import { colors } from "../theme/colors";
+
 import { StyleSheet } from "react-native";
 var FlatListStyles = StyleSheet.create({
   CardTitle: {
@@ -297,5 +301,13 @@ var FlatListStyles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
+
+export const OrderButton = styled(Button).attrs({
+  color: colors.brand.primary,
+})`
+  padding: ${(props) => props.theme.space[2]};
+  width: 80%;
+  align-self: center;
+`;
 
 export default FlatListStyles;

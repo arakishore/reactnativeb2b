@@ -1,9 +1,10 @@
 import React, { useState } from 'react'; // Don't forget to import useState
  
 import {  useDispatch } from 'react-redux';
+import { AntDesign } from "@expo/vector-icons";
 
-import { TouchableOpacity, View, Text, Image, StyleSheet ,ScrollView} from 'react-native';
-import FlatListStyles from "../components/FlatlistCss";
+import {SafeAreaView, TouchableOpacity, View, Text, Image, StyleSheet ,ScrollView} from 'react-native';
+import FlatListStyles, { OrderButton } from "../components/FlatlistCss";
 import { Card,List, Divider } from 'react-native-paper';
 
 import Swiper from 'react-native-swiper';
@@ -12,6 +13,8 @@ import Swiper from 'react-native-swiper';
 import RuppeeIcon from "../components/utility/RuppeeIcon";
  
 import ImageModal from './ImageModal'; // Adjust the import path
+import { Spacer } from '../components/spacer/spacer.component';
+import TextComponent from '../components/TextComponent';
 
 const ProductDetail = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -114,7 +117,16 @@ const ProductDetail = ({ navigation, route }) => {
     // Add your cart logic here
   };
 
+  
+  const handleQuantity = (flag, itemData) => {
+    let totalAmt = 0;
+    let totalQty = 0;
+   
+  };
   return (
+    <SafeAreaView style={styles.outerScrollView}>
+    <ScrollView style={styles.outerScrollView}>
+
     <Card style={styles.card}>
 
       <View style={styles.imageBigView}>
@@ -142,21 +154,50 @@ const ProductDetail = ({ navigation, route }) => {
         <View style={styles.columnColLeft}>
           <Text style={styles.mrp} >MRP: <RuppeeIcon></RuppeeIcon>{prod_mrp}</Text>
           <Text style={styles.offerprice} >Our Offer: <RuppeeIcon></RuppeeIcon>{prod_selling_price}</Text>
-          <Text style={styles.miniqty} >Mini Qty Box/Try: {mimimum_qty}</Text>
-          <Text style={styles.save} >Save: <RuppeeIcon></RuppeeIcon>{prod_savings}</Text>
+         
         </View>
         <View style={styles.columnColRight}>
+          <Text style={styles.miniqty} >Mini Qty Box/Try: {mimimum_qty}</Text>
+          <Text style={styles.save} >Save: <RuppeeIcon></RuppeeIcon>{prod_savings}</Text>
+          <View
+            style={{
+              ...FlatListStyles.quantityMain,
+            }}
+          >
+            <TouchableOpacity
+              style={{ ...FlatListStyles.quantityContainer }}
+              onPress={() => handleQuantity(0, product)}
+            >
+              <AntDesign name="minus" size={15} color="#fff" />
+            </TouchableOpacity>
 
-          <View style={styles.buttonView} >
+            <TouchableOpacity
+              
+              style={{
+                ...FlatListStyles.quantityContainer,
+                paddingHorizontal: 30,
+              }}
+            >
+              <TextComponent
+                
+                label={product.mimimum_qty.toString()}
+                style={{ ...FlatListStyles.itemQuantity }}
+              />
+            </TouchableOpacity>
 
-            <Text style={styles.buttonText}  >Add to Cart</Text>
-
+            <TouchableOpacity
+              style={{ ...FlatListStyles.quantityContainer }}
+              onPress={() => handleQuantity(1, product)}
+            >
+              <AntDesign name="plus" size={15} color="#fff" />
+            </TouchableOpacity>
           </View>
 
         </View>
       </View>
 
-      <ScrollView>
+      <ScrollView style={styles.innerScrollView}>
+
         <List.Accordion
           title="Description"
           left={(props) => <List.Icon {...props} icon="bread-slice" />}
@@ -217,11 +258,36 @@ const ProductDetail = ({ navigation, route }) => {
             onClose={handleCloseModal}
           />
     </Card>
+    
+    </ScrollView>
+    <Spacer  position="bottom" size="large">
+    <OrderButton
+         
+          mode="contained"
+          
+        >
+         Add to Cart
+        </OrderButton>
+      </Spacer>
+    </SafeAreaView>
   );
 };
 
 
 const styles = StyleSheet.create({
+  outerScrollView: {
+    flex: 1,
+    
+  },
+  outerScrollView: {
+    flex: 1,
+    
+  },
+  innerScrollView: {
+    maxHeight: 500, // Limit the height of the nested ScrollView
+    marginTop: 0,
+    
+  },
   accordion: {
     backgroundColor: '#f0f0f0',
     
