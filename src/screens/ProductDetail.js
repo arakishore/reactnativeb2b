@@ -1,46 +1,43 @@
 import React, { useState } from 'react'; // Don't forget to import useState
- 
-import {  useDispatch } from 'react-redux';
-import { AntDesign } from "@expo/vector-icons";
 
-import {SafeAreaView, TouchableOpacity, View, Text, Image, StyleSheet ,ScrollView} from 'react-native';
+import { useSelector,useDispatch } from 'react-redux';
+import { AntDesign, Feather } from "@expo/vector-icons";
+
+import { SafeAreaView, TouchableOpacity, View, Text, Image, StyleSheet, ScrollView, useWindowDimensions, StatusBar } from 'react-native';
+import RenderHtml from 'react-native-render-html';
+
+import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
+
+
 import FlatListStyles, { OrderButton } from "../components/FlatlistCss";
-import { Card,List, Divider } from 'react-native-paper';
+import { Card, List, Divider } from 'react-native-paper';
 
 import Swiper from 'react-native-swiper';
 
-
 import RuppeeIcon from "../components/utility/RuppeeIcon";
- 
+
 import ImageModal from './ImageModal'; // Adjust the import path
 import { Spacer } from '../components/spacer/spacer.component';
 import TextComponent from '../components/TextComponent';
+ 
+
 
 const ProductDetail = ({ navigation, route }) => {
+
   const dispatch = useDispatch();
   const { prodId, categoryId, product } = route.params;
 
-  const [breakfastExpanded, setBreakfastExpanded] = useState(false);
-  const [lunchExpanded, setLunchExpanded] = useState(false);
-  const [dinnerExpanded, setDinnerExpanded] = useState(false);
-  const [drinksExpanded, setDrinksExpanded] = useState(false);
 
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
 
-  const handleImagePress = (imagePath) => {
-    setSelectedImage(imagePath);
-    setModalVisible(true);
-  };
-  const handleCloseModal = () => {
-    setModalVisible(false);
-  };
+
   const {
     brand_id = product.brand_id,
     brand_name = product.brand_name,
     cashback_amount = product.cashback_amount,
-     category_group_name = product.category_group_name,
+    category_group_name = product.category_group_name,
     category_id = product.category_id,
     category_l1_id = product.category_l1_id,
     category_l1_name = product.category_l1_name,
@@ -54,7 +51,7 @@ const ProductDetail = ({ navigation, route }) => {
     mimimum_qty = product.mimimum_qty,
     packing_type = product.packing_type,
     premium_delivery_charges = product.premium_delivery_charges,
-     
+
     prod_code = product.prod_code,
     prod_color_code = product.prod_color_code,
     prod_desc_text = product.prod_desc_text,
@@ -101,174 +98,238 @@ const ProductDetail = ({ navigation, route }) => {
     sub_category_name = product.sub_category_name,
     vendor_id = product.vendor_id,
     vendor_name = product.vendor_name,
-    
+
 
   } = product;
 
- 
+
   const image_paths = [
     product.prod_image_1_path,
     product.prod_image_2_path,
     product.prod_image_3_path
   ];
+  // Define the routes for your tabs
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'description', title: 'Description' },
+    { key: 'specification', title: 'Specification' },
+    { key: 'warranty', title: 'Warranty' },
+    { key: 'returns', title: 'Returns' },
+  ]);
+
+
+   const { width: screenWidth } = useWindowDimensions();
+
+
+  const handleImagePress = (imagePath) => {
+    setSelectedImage(imagePath);
+    setModalVisible(true);
+  };
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+
+  // Define a function to generate the routes based on the content availability
+  const generateRoutes = () => {
+    const availableRoutes = [
+      { key: 'description', title: 'Description' },
+      { key: 'specification', title: 'Specification' },
+      { key: 'warranty', title: 'Warranty' },
+      { key: 'returns', title: 'Returns' },
+    ];
+
+    // Filter out tabs with blank content
+    return availableRoutes.filter((route) => {
+      switch (route.key) {
+        case 'description':
+          return prod_desc_text.trim() !== '';
+        case 'specification':
+          return prod_specification_text.trim() !== '';
+        case 'warranty':
+          return prod_warranty_text.trim() !== '';
+        case 'returns':
+          return prod_return_text.trim() !== '';
+        default:
+          return true; // Include any other tabs by default
+      }
+    });
+  };
+
+  const generatedRoutes = generateRoutes();
+
+  // Define the content for each tab conditionally
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case 'description':
+        return (
+          <ScrollView style={stylesTab.tabContent}>
+            <View style={stylesTab.tabviewcontent}>
+              
+              <RenderHtml
+                 contentWidth={screenWidth}
+
+                source={{ html: prod_desc_text }}
+                enableExperimentalMarginCollapsing={true}
+              />
+            </View>
+          </ScrollView>
+        );
+      case 'specification':
+        return (
+          <ScrollView style={stylesTab.tabContent}>
+            <View style={stylesTab.tabviewcontent}>
+            <RenderHtml
+                 contentWidth={screenWidth}
+
+                source={{ html: prod_specification_text }}
+                enableExperimentalMarginCollapsing={true}
+              />
+              
+            </View>
+          </ScrollView>
+        );
+      case 'warranty':
+        return (
+          <ScrollView style={stylesTab.tabContent}>
+            <View style={stylesTab.tabviewcontent}>
+            <RenderHtml
+                 contentWidth={screenWidth}
+
+                source={{ html: prod_warranty_text }}
+                enableExperimentalMarginCollapsing={true}
+              />
+                
+            </View>
+          </ScrollView>
+        );
+      case 'returns':
+        return (
+          <ScrollView style={stylesTab.tabContent}>
+            <View style={stylesTab.tabviewcontent}>
+            <RenderHtml
+                 contentWidth={screenWidth}
+
+                source={{ html: prod_return_text }}
+                enableExperimentalMarginCollapsing={true}
+              />
+               
+            </View>
+          </ScrollView>
+        );
+      default:
+        return null;
+    }
+  };
+
   //console.log('product', product);
   const handleAddToCart1 = () => {
     // You can use the product ID here
     // Add your cart logic here
   };
 
-  
+
   const handleQuantity = (flag, itemData) => {
     let totalAmt = 0;
     let totalQty = 0;
-   
+    console.log(flag);
+
   };
   return (
     <SafeAreaView style={styles.outerScrollView}>
-    <ScrollView style={styles.outerScrollView}>
-
-    <Card style={styles.card}>
-
-      <View style={styles.imageBigView}>
-      <Swiper style={styles.wrapper} height={200} showsButtons={false}>
-          {image_paths.map((imagePath, index) => (
-             <TouchableOpacity
-             key={index}
-             onPress={() => handleImagePress(imagePath)}
-             style={styles.slide}
-           >
-            
-              <Image source={{ uri: imagePath }} style={styles.imageCover} />
-            
-            </TouchableOpacity>
-          ))}
-        </Swiper>
-      </View>
-
-      <View style={styles.containerRow}>
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <Text style={FlatListStyles.CardTitle}>{prod_name}</Text>
+      <Card style={styles.card}>
+        <View style={styles.imageBigView}>
+          <Swiper style={styles.wrapper} height={150} showsButtons={false}>
+            {image_paths.map((imagePath, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleImagePress(imagePath)}
+                style={styles.slide}
+              >
+                <Image source={{ uri: imagePath }} style={styles.imageCover} />
+              </TouchableOpacity>
+            ))}
+          </Swiper>
         </View>
-      </View>
-      <View style={styles.containerRow}>
-        <View style={styles.columnColLeft}>
-          <Text style={styles.mrp} >MRP: <RuppeeIcon></RuppeeIcon>{prod_mrp}</Text>
-          <Text style={styles.offerprice} >Our Offer: <RuppeeIcon></RuppeeIcon>{prod_selling_price}</Text>
-         
+        <View style={styles.containerRow}>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <Text style={FlatListStyles.CardTitle}>{prod_name}</Text>
+          </View>
         </View>
-        <View style={styles.columnColRight}>
-          <Text style={styles.miniqty} >Mini Qty Box/Try: {mimimum_qty}</Text>
-          <Text style={styles.save} >Save: <RuppeeIcon></RuppeeIcon>{prod_savings}</Text>
-          <View
-            style={{
-              ...FlatListStyles.quantityMain,
-            }}
-          >
-            <TouchableOpacity
-              style={{ ...FlatListStyles.quantityContainer }}
-              onPress={() => handleQuantity(0, product)}
-            >
-              <AntDesign name="minus" size={15} color="#fff" />
-            </TouchableOpacity>
+        <View style={styles.containerRow}>
+          <View style={styles.columnColLeft}>
+            <Text style={styles.mrp} >MRP: <RuppeeIcon></RuppeeIcon>{prod_mrp}</Text>
+            <Text style={styles.offerprice} >Our Offer: <RuppeeIcon></RuppeeIcon>{prod_selling_price}</Text>
 
-            <TouchableOpacity
-              
+          </View>
+          <View style={styles.columnColRight}>
+            <Text style={styles.miniqty} >Mini Qty Box/Try: {mimimum_qty}</Text>
+            <Text style={styles.save} >Save: <RuppeeIcon></RuppeeIcon>{prod_savings}</Text>
+            <View
               style={{
-                ...FlatListStyles.quantityContainer,
-                paddingHorizontal: 30,
+                ...FlatListStyles.quantityMain,
               }}
             >
-              <TextComponent
-                
-                label={product.mimimum_qty.toString()}
-                style={{ ...FlatListStyles.itemQuantity }}
-              />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={{ ...FlatListStyles.quantityContainer }}
+                onPress={() => handleQuantity(0, product)}
+              >
+                <AntDesign name="minus" size={15} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...FlatListStyles.quantityContainer,
+                  paddingHorizontal: 30,
+                }}
+              >
+                <TextComponent
 
-            <TouchableOpacity
-              style={{ ...FlatListStyles.quantityContainer }}
-              onPress={() => handleQuantity(1, product)}
-            >
-              <AntDesign name="plus" size={15} color="#fff" />
-            </TouchableOpacity>
+                  label={product.mimimum_qty.toString()}
+                  style={{ ...FlatListStyles.itemQuantity }}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{ ...FlatListStyles.quantityContainer }}
+                onPress={() => handleQuantity(1, product)}
+              >
+                <AntDesign name="plus" size={15} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
           </View>
-
         </View>
+
+
+        <ImageModal
+          visible={modalVisible}
+          imagePath={selectedImage}
+          onClose={handleCloseModal}
+        />
+      </Card>
+
+      <View style={stylesTab.tabView}>
+        <TabView
+          navigationState={{ index, routes: generatedRoutes }} // Use generatedRoutes
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          renderTabBar={(props) => (
+            <TabBar
+              {...props}
+              indicatorStyle={{ backgroundColor: 'blue' }}
+              style={stylesTab.tabBar}
+              labelStyle={stylesTab.tabLabel}
+              scrollEnabled={false}
+            />
+          )}
+          style={{ zIndex: 1 }}
+        />
       </View>
-
-      <ScrollView style={styles.innerScrollView}>
-
-        <List.Accordion
-          title="Description"
-          left={(props) => <List.Icon {...props} icon="bread-slice" />}
-          expanded={breakfastExpanded}
-           onPress={() => setBreakfastExpanded(!breakfastExpanded)}
-           style={styles.accordion}
-           titleStyle={styles.titleStyle}
-           contentStyle={styles.contentStyle}
-        >
-          <Text style={styles.contentContainer}>aaaaaaa</Text>
-        </List.Accordion>
-        <Divider />
-        <List.Accordion
-          title="Specification"
-          left={(props) => <List.Icon {...props} icon="hamburger" />}
-          expanded={lunchExpanded}
-          onPress={() => setLunchExpanded(!lunchExpanded)}
-          style={styles.accordion}
-          titleStyle={styles.titleStyle}
-          contentStyle={styles.contentStyle}
-        >
-          <List.Item title="Burger w/ Fries" />
-          <Divider />
-          
-        </List.Accordion>
-        <Divider />
-        <List.Accordion
-          title="Warranty"
-          left={(props) => <List.Icon {...props} icon="food-variant" />}
-          expanded={dinnerExpanded}
-          onPress={() => setDinnerExpanded(!dinnerExpanded)}
-          style={styles.accordion}
-          titleStyle={styles.titleStyle}
-          contentStyle={styles.contentStyle}
-        >
-          <List.Item title="Spaghetti Bolognese" />
-         
-        </List.Accordion>
-        <Divider />
-
-        <List.Accordion
-          title="Returns"
-          left={(props) => <List.Icon {...props} icon="cup" />}
-          expanded={drinksExpanded}
-          onPress={() => setDrinksExpanded(!drinksExpanded)}
-          style={styles.accordion}
-          titleStyle={styles.titleStyle}
-          contentStyle={styles.contentStyle}
-        >
-          <List.Item title="Coffee" />
-          <Divider />
-          
-        </List.Accordion>
-      </ScrollView>
-      <ImageModal
-            visible={modalVisible}
-            imagePath={selectedImage}
-            onClose={handleCloseModal}
-          />
-    </Card>
-    
-    </ScrollView>
-    <Spacer  position="bottom" size="large">
-    <OrderButton
-         
-          mode="contained"
-          
-        >
-         Add to Cart
-        </OrderButton>
+      <Spacer position="bottom" size="large">
+        <OrderButton mode="contained">Add to Cart</OrderButton>
       </Spacer>
+
+
     </SafeAreaView>
   );
 };
@@ -277,22 +338,15 @@ const ProductDetail = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   outerScrollView: {
     flex: 1,
-    
+
   },
-  outerScrollView: {
-    flex: 1,
-    
-  },
-  innerScrollView: {
-    maxHeight: 500, // Limit the height of the nested ScrollView
-    marginTop: 0,
-    
-  },
+
+
   accordion: {
     backgroundColor: '#f0f0f0',
-    
-    padding:0,
-    margin:0
+
+    padding: 0,
+    margin: 0
   },
   titleStyle: {
     fontWeight: 'bold',
@@ -339,7 +393,7 @@ const styles = StyleSheet.create({
 
   },
   imageBigView: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     justifyContent: 'center',
     overflow: 'hidden'       // Hide any overflowing content
 
@@ -409,4 +463,39 @@ const styles = StyleSheet.create({
   },
 });
 
+
+
+const stylesTab = StyleSheet.create({
+  container: {
+    marginTop: StatusBar.currentHeight,
+  },
+  scene: {
+    flex: 1,
+  },
+  // Add a new style for tab content
+  tabContent: {
+    flex: 1, // Allow the content to take up all available space
+  },
+  tabBar: {
+    backgroundColor: 'white',
+    justifyContent: 'space-between',
+  },
+  tabLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: 'black',
+    paddingHorizontal: 0, // Add horizontal padding to the tabs
+    width: 75, // Set a fixed height for the tabs
+    overflow: 'hidden', // Hide any text overflow
+
+  },
+  // Add a new style for the tab view container
+  tabView: {
+    flex: 1, // Allow the tab view to take up all available space
+  },
+  tabviewcontent: {
+    backgroundColor: '#ffffff',
+    padding: 4,
+  },
+});
 export default ProductDetail

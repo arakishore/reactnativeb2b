@@ -1,9 +1,16 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, StyleSheet, Text } from 'react-native'
 import { TextInput as Input } from 'react-native-paper'
 import { theme } from '../core/theme'
 
 export default function TextInput({ errorText, description, ...props }) {
+ 
+  useEffect(() => {
+    console.log("TextInput props ",props);
+  }, []);
+
+
+
   return (
     <View style={styles.container}>
       <Input
@@ -12,6 +19,7 @@ export default function TextInput({ errorText, description, ...props }) {
         underlineColor="transparent"
         mode="outlined"
         {...props}
+         
       />
       {description && !errorText ? (
         <Text style={styles.description}>{description}</Text>

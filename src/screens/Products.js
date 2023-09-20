@@ -60,7 +60,6 @@ const Products = ({ navigation, route }) => {
       data={filteredProducts}
       renderItem={renderItem}
       keyExtractor={(item) => item.prod_id}
-
     />
   );
 
