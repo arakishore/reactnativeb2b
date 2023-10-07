@@ -16,6 +16,10 @@ const Products = ({ navigation, route }) => {
   // console.log('category_id:', category_id);
   // console.log('category:', category);
   const products = useSelector(state => state.categoryReducer.products);
+  const cart_items = useSelector(state => state.cartReducer.cart_items);
+
+  //console.log("Products.js cart_items",cart_items);
+
   const [selectedCategory, setSelectedCategory] = useState(category_id);
   const filteredProducts = products.filter(
     (product) => product.category_id === selectedCategory
@@ -34,19 +38,11 @@ const Products = ({ navigation, route }) => {
   const renderItem = ({ item }) => {
     try {
       return (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("ProductDetail", {
-              prodId: item.prod_id,
-              categoryId: item.category_id,
-              product: item,
-            })
-          }
-        >
+        
           <Spacer position="bottom" size="large">
             <ProdutListcard product={item} />
           </Spacer>
-        </TouchableOpacity>
+        
       );
     } catch (error) {
       console.error("Error rendering item:", error);

@@ -258,11 +258,12 @@ var FlatListStyles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "flex-end",
     alignItems: "baseline",
-    backgroundColor: "#ADD8E6",
+    backgroundColor: "#ffb3dd",
     // padding: 5,
     borderWidth: 1,
-    borderColor: "#00669B",
+    borderColor: "#dd2e8f",
     borderRadius: 5,
+    
   },
   quantityContainer: {
     // flexDirection: "row",

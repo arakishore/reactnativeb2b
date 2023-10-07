@@ -15,17 +15,17 @@ import titleSlice from './slices/titleSlice';
 
 // import favoritesSlice from './slices/favorites';
 
-//  import cartSlice from './slices/cartSlice';
+import cartSlice from './slices/cartSlice';
 
 const rootReducer = combineReducers({
-//  favoritesReducer: favoritesSlice,
- categoryReducer: categorySlice,
- titleReducer: titleSlice,
- // cartReducer: cartSlice
+  //  favoritesReducer: favoritesSlice,
+  categoryReducer: categorySlice,
+  titleReducer: titleSlice,
+  cartReducer: cartSlice
 });
 
 const store = configureStore({
-  reducer : rootReducer
+  reducer: rootReducer
 });
 
 export default store;

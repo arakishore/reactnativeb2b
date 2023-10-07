@@ -21,32 +21,35 @@ import { mobileValidator } from '../../helpers/mobileValidator';
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState({ value: '', error: '' })
-//  const [email, setEmail] = useState({ value: '', error: '' })
-  const [mobile, setmMbile] = useState({ value: '', error: '' })
+  //  const [email, setEmail] = useState({ value: '', error: '' })
+  const [mobile, setMobile] = useState({ value: '', error: '' })
 
   const [password, setPassword] = useState({ value: '', error: '' })
+  const [confirmpassword, setConfirmpasswordPassword] = useState({ value: '', error: '' })
 
   const onSignUpPressed = async () => {
     let error = false;
-    const nameError = nameValidator(name.value)
-    //const emailError = emailValidator(email.value)
-    const mobileError = mobileValidator(mobile.value)
-
-    const passwordError = passwordValidator(password.value)
-    if (mobileError || passwordError || nameError) {
-
+    const nameError = nameValidator(name.value);
+    //const emailError = emailValidator(email.value);
+    const mobileError = mobileValidator(mobile.value);
+    const passwordError = passwordValidator(password.value);
+    const confirmPasswordError = confirmPasswordValidator(
+      password.value,
+      confirmpassword.value
+    );
+    if (mobileError || passwordError || nameError || confirmPasswordError) {
       setName({ ...name, error: nameError })
-      //setEmail({ ...email, error: emailError })
-      setmMbile({ ...mobile, error: mobileError })
-
+      setMobile({ ...mobile, error: mobileError })
       setPassword({ ...password, error: passwordError })
+      setConfirmpasswordPassword({ ...confirmpassword, error: confirmPasswordError });
+
       error = true;
       return
     }
     if (!error) {
 
       const network = await handleNetwork();
-      console.log("network", API_BASE_URL+ endpoint);
+      console.log("network", API_BASE_URL + endpoint);
 
       if (network) {
         const requestData = {
@@ -57,24 +60,29 @@ export default function RegisterScreen({ navigation }) {
           "full_name": name.value,
           "mobile_number": mobile.value,
           "password": password.value
-          
+
         };
         try {
-          const response = await axios.post(API_BASE_URL+ endpoint.register, requestData, {
+          const response = await axios.post(API_BASE_URL + endpoint.register, requestData, {
             headers: {
               'Content-Type': 'application/json', // Set the content type to JSON
             },
           });
 
           // Handle successful response
-           console.log(response.data);
+          console.log(response.data);
           if (response.data.status) {
-
-            // // navigation.navigate("MainRoute");
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'LoginScreen' }],
-            })
+            navigation.navigate("OtpVerificationScreen", {
+              mobile: mobile.value,
+              full_name: name.value,
+              user_id: response.data.user_id,
+              // Add more parameters as needed
+            });
+            // navigation.navigate("OtpVerificationScreen");
+            // navigation.reset({
+            //   index: 0,
+            //   routes: [{ name: 'OtpVerificationScreen' }],
+            // })
           } else {
             console.log(response.data.message);
             alert(response.data.message);
@@ -97,6 +105,17 @@ export default function RegisterScreen({ navigation }) {
     // })
   }
 
+  function confirmPasswordValidator(password, confirmPassword) {
+    if (!confirmPassword) return "Confirm Password can't be empty."
+       
+    if (password !== confirmPassword) {
+      return 'Passwords do not match';
+    }
+  
+    // Add additional password validation logic if needed
+  
+    return ''; // Return an empty string if there are no errors
+  }
 
   return (
     <Background>
@@ -123,11 +142,11 @@ export default function RegisterScreen({ navigation }) {
         textContentType="emailAddress"
         keyboardType="email-address"
       /> */}
-       <TextInput
+      <TextInput
         label="Mobile"
         returnKeyType="next"
         value={mobile.value}
-        onChangeText={(text) => setmMbile({ value: text, error: '' })}
+        onChangeText={(text) => setMobile({ value: text, error: '' })}
         error={
           mobile.error
             ? mobile.error
@@ -143,6 +162,15 @@ export default function RegisterScreen({ navigation }) {
         onChangeText={(text) => setPassword({ value: text, error: '' })}
         error={!!password.error}
         errorText={password.error}
+        secureTextEntry
+      />
+      <TextInput
+        label="Confirm Password"
+        returnKeyType="done"
+        value={confirmpassword.value}
+        onChangeText={(text) => setConfirmpasswordPassword({ value: text, error: '' })}
+        error={!!confirmpassword.error}
+        errorText={confirmpassword.error}
         secureTextEntry
       />
       <Button

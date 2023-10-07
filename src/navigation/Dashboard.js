@@ -22,7 +22,29 @@ const Dashboard = ({ navigation, route }) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    console.log("Dashboard ", navigation);
+    //console.log("Dashboard ", navigation);
+    (async () => {
+      if (isFocused) {
+        try {
+          const cartItem = await AsyncStorage.getItem("cartItem");
+        
+          if (cartItem !== null) {
+            // Data exists in AsyncStorage, and it's not null
+           // console.log("Dashboard.js cartItem", cartItem);
+            // You can parse the retrieved data if it's expected to be JSON, e.g.,
+            // const parsedCartItem = JSON.parse(cartItem);
+            // Do something with cartItem or parsedCartItem
+          } else {
+            // Data doesn't exist in AsyncStorage, or it's null
+            console.log("Dashboard.js cartItem is null or doesn't exist");
+            // Handle this case as needed, e.g., initialize cartItem or show a message
+          }
+        } catch (error) {
+          // Handle errors that may occur during AsyncStorage operations
+          console.error("Dashboard.js Error retrieving cartItem from AsyncStorage:", error);
+        }
+      }
+    })();
 
   }, [isFocused]);
 

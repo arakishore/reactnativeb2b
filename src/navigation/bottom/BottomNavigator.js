@@ -14,6 +14,7 @@ import Screen2 from './Screen2';
 import Screen3 from './Screen3';
 import { CategoryProduct } from './CategoryProduct';
 import  Category  from '../../screens/Category';
+import Cart from '../../screens/Cart';
 
 const Bottom = createBottomTabNavigator();
 
@@ -128,7 +129,7 @@ const BottomNavigator = () => {
       />   */}
       <Bottom.Screen
         name="Screen3"
-        component={Screen3}
+        component={Cart}
         options={{
           headerShown: true,
           headerMode :'float',

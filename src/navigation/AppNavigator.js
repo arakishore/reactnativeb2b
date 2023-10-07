@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'react-native'
 import { Provider as PaperProvider } from 'react-native-paper';
 
@@ -9,14 +9,14 @@ import { theme } from '../core/theme'
 import Splash from '../screens/Splash';
 import Dashboard from './Dashboard';
 import SearchScreen from '../screens/SearchScreen';
-import { LoginScreen, RegisterScreen, ResetPasswordScreen } from '../screens/login';
+import { LoginScreen, RegisterScreen, ResetPasswordScreen, OtpVerificationScreen } from '../screens/login';
 //import { Products } from '../screens/Products';
-import {  useDispatch } from 'react-redux';
-import { fetchCategoriesAndProductsExtra  } from '../store/redux/slices/categorySlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCategoriesAndProductsExtra } from '../store/redux/slices/categorySlice';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Category from '../screens/Category';
 import Products from '../screens/Products';
-
+ 
 
 const Drawer = createDrawerNavigator();
 
@@ -24,12 +24,6 @@ const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
-    const dispatch = useDispatch();
- 
-    useEffect(() => {
-        dispatch(fetchCategoriesAndProductsExtra());
-    }, [dispatch]);
-
  
 
     return (
@@ -53,6 +47,11 @@ const AppNavigator = () => {
                         options={{ headerShown: false }}
                     />
                     <Stack.Screen
+                        name="OtpVerificationScreen"
+                        component={OtpVerificationScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
                         name="ResetPasswordScreen"
                         component={ResetPasswordScreen}
                         options={{ headerShown: false }}
@@ -68,7 +67,7 @@ const AppNavigator = () => {
                         component={Category}
                         options={{ headerShown: false }}
                     />
-                      <Stack.Screen
+                    <Stack.Screen
                         name="Products"
                         component={Products}
                         options={{ headerShown: false }}

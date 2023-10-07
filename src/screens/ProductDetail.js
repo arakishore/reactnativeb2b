@@ -1,7 +1,8 @@
-import React, { useState } from 'react'; // Don't forget to import useState
+import React, { useEffect, useState } from 'react'; // Don't forget to import useState
 
-import { useSelector,useDispatch } from 'react-redux';
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { useSelector, useDispatch } from 'react-redux';
+//import { AntDesign, Feather } from "@expo/vector-icons";
+import Icon from 'react-native-vector-icons/FontAwesome'; // Replace with the appropriate icon library
 
 import { SafeAreaView, TouchableOpacity, View, Text, Image, StyleSheet, ScrollView, useWindowDimensions, StatusBar } from 'react-native';
 import RenderHtml from 'react-native-render-html';
@@ -10,7 +11,7 @@ import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
 
 import FlatListStyles, { OrderButton } from "../components/FlatlistCss";
-import { Card, List, Divider } from 'react-native-paper';
+import { Card, List, Divider, Button } from 'react-native-paper';
 
 import Swiper from 'react-native-swiper';
 
@@ -19,7 +20,9 @@ import RuppeeIcon from "../components/utility/RuppeeIcon";
 import ImageModal from './ImageModal'; // Adjust the import path
 import { Spacer } from '../components/spacer/spacer.component';
 import TextComponent from '../components/TextComponent';
- 
+import { fetchCartDataExtra, sendCartItems } from '../store/redux/slices/cartSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 const ProductDetail = ({ navigation, route }) => {
@@ -27,7 +30,14 @@ const ProductDetail = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { prodId, categoryId, product } = route.params;
 
+  const [isInCart, setIsInCart] = useState(0);
+  const [extrAddCartqty, setExtrAddCartqty] = useState(product.mimimum_qty);
 
+  const [mimimumqty, setMimimumqty] = useState(product.mimimum_qty);
+  const [cartItemQty, setCartItemQty] = useState(0);
+  const [cartItemDetail, setCartItemDetail] = useState([]);
+
+  const [prodductId, setProdductId] = useState(prodId);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
@@ -117,10 +127,102 @@ const ProductDetail = ({ navigation, route }) => {
     { key: 'returns', title: 'Returns' },
   ]);
 
+  const cart_items = useSelector(state => state.cartReducer.cart_items);
+  // Use useEffect to update isInCart when productToFind or cart_items change
+   
+  useEffect(() => {
+    const foundCartItem = cart_items.find(
+      (cart_item) => cart_item.product_fid === prodductId
+    );
+    setMimimumqty(mimimum_qty);
+    if (foundCartItem) {
+      // Item found in cart
+       setIsInCart(1);
+       setExtrAddCartqty(1); // Assuming quantity is stored in cart_qty
+       setCartItemQty(foundCartItem.cart_qty);
+       setCartItemDetail(foundCartItem);
+    } else {
+      // Item not found in cart
+      setIsInCart(0);
+      setExtrAddCartqty(mimimum_qty); // Assuming quantity is stored in cart_qty
+      setCartItemQty(0);
+      setCartItemDetail([]);
+    }
 
-   const { width: screenWidth } = useWindowDimensions();
+    console.log("cartItemQtyaaaaaaaa:", cartItemQty);
+
+  }, []);
+
+  
+  // Use a useEffect hook to listen for changes in cart_items
+  useEffect(() => {
+    // cart_items has been updated here, you can use it for further processing
+    //console.log('Updated cart_items:', cart_items);
+  
+    // You can perform additional actions here based on the updated cart items
+  }, []);
+
+  const handleAddToCart = async (flag, itemData) => {
+    const user_id = await AsyncStorage.getItem("user_id");
+
+     let qty=0;
+    // Pass parameters to the action when dispatching it
+    // if (!isInCart) {
+    //   flag = product.mimimum_qty
+    // }
+    if(flag=="-"){
+      qty = parseInt(cartItemQty) - parseInt(extrAddCartqty);
+      
+    } else {
+      qty = parseInt(cartItemQty) + parseInt(extrAddCartqty);
+    }
+    if(qty<mimimumqty){
+      qty = 0;
+    }
+    console.log("extrAddCartqty"+extrAddCartqty);
+    console.log("cartItemQty"+cartItemQty);
+    console.log("qty"+qty);
+     console.log("mimimumqty"+mimimumqty)
+    
+    const params = {
+      // Define your parameters here
+      // For example:
+      "frm_mode": "cartaddeditdeleteitem",
+      "user_id": user_id,
+      "prod_id": itemData.prod_id,
+      "cart_qty": qty,
+      "item_qty1": "0",
+      "item_qty2": "0"
+    };
+    // Dispatch an action to send cart items
+    console.log("ProductDetail.js params:", params);
+    dispatch(sendCartItems(params))
+      .then((response) => {
+        // Handle the response from the dispatched action
+        console.log("ProductDetail.js Cart items sent successfully:", response);
+        // You can return something here if needed
+        //return "Success"; // Replace with the data you want to return
+       
+       setCartItemQty(qty);
+         // Dispatch an action to fetch cart data
+         const requestData2 = {
+          frm_mode: "cartlist",
+          user_id: user_id, // Use the fetched user_id here
+        };
+  
+         dispatch(fetchCartDataExtra(requestData2)); // Replace with the appropriate action for fetching cart data
+      })
+      .catch((error) => {
+        console.error("ProductDetail.js Error sending cart items:", error);
+        // You can return an error or handle it as needed
+        //  throw error; // Throw the error to propagate it further, or return an error message
+      });
+
+  };
 
 
+
+  const { width: screenWidth } = useWindowDimensions();
   const handleImagePress = (imagePath) => {
     setSelectedImage(imagePath);
     setModalVisible(true);
@@ -165,9 +267,9 @@ const ProductDetail = ({ navigation, route }) => {
         return (
           <ScrollView style={stylesTab.tabContent}>
             <View style={stylesTab.tabviewcontent}>
-              
+
               <RenderHtml
-                 contentWidth={screenWidth}
+                contentWidth={screenWidth}
 
                 source={{ html: prod_desc_text }}
                 enableExperimentalMarginCollapsing={true}
@@ -179,13 +281,13 @@ const ProductDetail = ({ navigation, route }) => {
         return (
           <ScrollView style={stylesTab.tabContent}>
             <View style={stylesTab.tabviewcontent}>
-            <RenderHtml
-                 contentWidth={screenWidth}
+              <RenderHtml
+                contentWidth={screenWidth}
 
                 source={{ html: prod_specification_text }}
                 enableExperimentalMarginCollapsing={true}
               />
-              
+
             </View>
           </ScrollView>
         );
@@ -193,13 +295,13 @@ const ProductDetail = ({ navigation, route }) => {
         return (
           <ScrollView style={stylesTab.tabContent}>
             <View style={stylesTab.tabviewcontent}>
-            <RenderHtml
-                 contentWidth={screenWidth}
+              <RenderHtml
+                contentWidth={screenWidth}
 
                 source={{ html: prod_warranty_text }}
                 enableExperimentalMarginCollapsing={true}
               />
-                
+
             </View>
           </ScrollView>
         );
@@ -207,13 +309,13 @@ const ProductDetail = ({ navigation, route }) => {
         return (
           <ScrollView style={stylesTab.tabContent}>
             <View style={stylesTab.tabviewcontent}>
-            <RenderHtml
-                 contentWidth={screenWidth}
+              <RenderHtml
+                contentWidth={screenWidth}
 
                 source={{ html: prod_return_text }}
                 enableExperimentalMarginCollapsing={true}
               />
-               
+
             </View>
           </ScrollView>
         );
@@ -222,19 +324,8 @@ const ProductDetail = ({ navigation, route }) => {
     }
   };
 
-  //console.log('product', product);
-  const handleAddToCart1 = () => {
-    // You can use the product ID here
-    // Add your cart logic here
-  };
 
 
-  const handleQuantity = (flag, itemData) => {
-    let totalAmt = 0;
-    let totalQty = 0;
-    console.log(flag);
-
-  };
   return (
     <SafeAreaView style={styles.outerScrollView}>
       <Card style={styles.card}>
@@ -264,7 +355,7 @@ const ProductDetail = ({ navigation, route }) => {
           </View>
           <View style={styles.columnColRight}>
             <Text style={styles.miniqty} >Mini Qty Box/Try: {mimimum_qty}</Text>
-            <Text style={styles.save} >Save: <RuppeeIcon></RuppeeIcon>{prod_savings}</Text>
+            <Text style={styles.save} >{/*Save: <RuppeeIcon></RuppeeIcon>*/}{prod_savings}</Text>
             <View
               style={{
                 ...FlatListStyles.quantityMain,
@@ -272,9 +363,9 @@ const ProductDetail = ({ navigation, route }) => {
             >
               <TouchableOpacity
                 style={{ ...FlatListStyles.quantityContainer }}
-                onPress={() => handleQuantity(0, product)}
+                onPress={() => handleAddToCart("-", product)}
               >
-                <AntDesign name="minus" size={15} color="#fff" />
+                <Icon name="minus" size={15} color="#fff" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
@@ -284,16 +375,16 @@ const ProductDetail = ({ navigation, route }) => {
               >
                 <TextComponent
 
-                  label={product.mimimum_qty.toString()}
+                  label={cartItemQty}
                   style={{ ...FlatListStyles.itemQuantity }}
                 />
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={{ ...FlatListStyles.quantityContainer }}
-                onPress={() => handleQuantity(1, product)}
+                onPress={() => handleAddToCart("+", product)}
               >
-                <AntDesign name="plus" size={15} color="#fff" />
+                <Icon name="plus" size={15} color="#fff" />
               </TouchableOpacity>
             </View>
 
@@ -322,12 +413,12 @@ const ProductDetail = ({ navigation, route }) => {
               scrollEnabled={false}
             />
           )}
-          style={{ zIndex: 1 }}
+          style={{ zIndex: 1}}
         />
       </View>
-      <Spacer position="bottom" size="large">
-        <OrderButton mode="contained">Add to Cart</OrderButton>
-      </Spacer>
+      {/* <Spacer position="bottom" size="large">
+        <Button mode="contained" style={styles.buttonaddtocart} >Add to Cart</Button>
+      </Spacer> */}
 
 
     </SafeAreaView>
@@ -340,11 +431,19 @@ const styles = StyleSheet.create({
     flex: 1,
 
   },
-
-
+  outlineButton: {
+    borderWidth: 1,          // Add a border
+    borderColor: '#000',    // Specify the border color
+    backgroundColor: 'transparent', // Make the background transparent
+  },
+  buttonaddtocart: {
+    color: '#696AC3',
+    width: '80%',
+    padding: 10,
+    alignSelf: 'center', // Center the button horizontally within its container
+  },
   accordion: {
     backgroundColor: '#f0f0f0',
-
     padding: 0,
     margin: 0
   },
@@ -492,10 +591,12 @@ const stylesTab = StyleSheet.create({
   // Add a new style for the tab view container
   tabView: {
     flex: 1, // Allow the tab view to take up all available space
+    backgroundColor: '#ffffff',
   },
   tabviewcontent: {
-    backgroundColor: '#ffffff',
-    padding: 4,
+    // backgroundColor: '#ffffff',
+    padding: 16,
+    
   },
 });
 export default ProductDetail

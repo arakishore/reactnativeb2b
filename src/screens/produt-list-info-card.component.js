@@ -1,20 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 
-import styled from "styled-components/native";
+//import styled from "styled-components/native";
 
 import { FlatList, TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import FlatListStyles from "../components/FlatlistCss";
 import { Card } from 'react-native-paper';
 
+import Icon from 'react-native-vector-icons/FontAwesome'; // Replace with the appropriate icon library
+import TextComponent from '../components/TextComponent';
 
 
 import RuppeeIcon from "../components/utility/RuppeeIcon";
+import { fetchCartDataExtra, sendCartItems } from "../store/redux/slices/cartSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
 
 
 export const ProdutListcard = ({ product = {} }) => {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const [isInCart, setIsInCart] = useState(0);
+  const [extrAddCartqty, setExtrAddCartqty] = useState(product.mimimum_qty);
+
+  const [mimimumqty, setMimimumqty] = useState(product.mimimum_qty);
+  const [cartItemQty, setCartItemQty] = useState(0);
+  const [cartItemDetail, setCartItemDetail] = useState([]);
+
+  const [prodductId, setProdductId] = useState(product.prod_id);
+
   const {
     name = product.prod_name,
     photos = product.prod_primary_image_path,
@@ -42,16 +60,121 @@ export const ProdutListcard = ({ product = {} }) => {
   } = product;
 
 
-  const handleAddToCart1 = () => {
-    // You can use the product ID here
-    //console.log(`Product ${id} added to cart`);
-    // Add your cart logic here
+  const cart_items = useSelector(state => state.cartReducer.cart_items);
+
+
+
+  useEffect(() => {
+    const foundCartItem = cart_items.find(
+      (cart_item) => cart_item.product_fid === prodductId
+    );
+    setMimimumqty(mimimum_qty);
+    if (foundCartItem) {
+      // Item found in cart
+      setIsInCart(1);
+      setExtrAddCartqty(1); // Assuming quantity is stored in cart_qty
+      setCartItemQty(foundCartItem.cart_qty);
+      setCartItemDetail(foundCartItem);
+    } else {
+      // Item not found in cart
+      setIsInCart(0);
+      setExtrAddCartqty(mimimum_qty); // Assuming quantity is stored in cart_qty
+      setCartItemQty(0);
+      setCartItemDetail([]);
+    }
+    console.log("produt-list-info-card.component.js render isInCart "+isInCart+", prodductId:"+prodductId+", cartItemQty:"+cartItemQty);
+
+    console.log("cartItemQtyaaaaaaaa:", cartItemQty);
+
+  }, []);
+
+
+  // Use a useEffect hook to listen for changes in cart_items
+  useEffect(() => {
+    // cart_items has been updated here, you can use it for further processing
+    //console.log('Updated cart_items:', cart_items);
+
+    // You can perform additional actions here based on the updated cart items
+  }, []);
+
+  const handleAddToCart = async (flag, itemData) => {
+    const user_id = await AsyncStorage.getItem("user_id");
+
+    let qty = 0;
+    // Pass parameters to the action when dispatching it
+    // if (!isInCart) {
+    //   flag = product.mimimum_qty
+    // }
+    if (flag == "-") {
+      qty = parseInt(cartItemQty) - parseInt(extrAddCartqty);
+
+    } else {
+      qty = parseInt(cartItemQty) + parseInt(extrAddCartqty);
+    }
+    if (qty < mimimumqty) {
+      qty = 0;
+    }
+    console.log("extrAddCartqty" + extrAddCartqty);
+    console.log("cartItemQty" + cartItemQty);
+    console.log("qty" + qty);
+    console.log("mimimumqty" + mimimumqty)
+
+    const params = {
+      // Define your parameters here
+      // For example:
+      "frm_mode": "cartaddeditdeleteitem",
+      "user_id": user_id,
+      "prod_id": itemData.prod_id,
+      "cart_qty": qty,
+      "item_qty1": "0",
+      "item_qty2": "0"
+    };
+    // Dispatch an action to send cart items
+    console.log("ProductDetail.js params:", params);
+    dispatch(sendCartItems(params))
+      .then((response) => {
+        // Handle the response from the dispatched action
+        console.log("ProductDetail.js Cart items sent successfully:", response.meta);
+        // You can return something here if needed
+        //return "Success"; // Replace with the data you want to return
+        console.log("produt-list-info-card.component.js render isInCart"+isInCart);
+
+        setCartItemQty(qty);
+        if(qty>0){
+          setIsInCart(1);
+        } else {
+          setIsInCart(0);
+        }
+        // Dispatch an action to fetch cart data
+        const requestData2 = {
+          frm_mode: "cartlist",
+          user_id: user_id, // Use the fetched user_id here
+        };
+
+        dispatch(fetchCartDataExtra(requestData2)); // Replace with the appropriate action for fetching cart data
+      })
+      .catch((error) => {
+        console.error("ProductDetail.js Error sending cart items:", error);
+        // You can return an error or handle it as needed
+        //  throw error; // Throw the error to propagate it further, or return an error message
+      });
+
   };
+
+
 
   return (
     <Card style={styles.card}>
 
-      <View style={styles.imageBigView}>
+<TouchableOpacity
+          onPress={() =>
+            navigation.navigate("ProductDetail", {
+              prodId: product.prod_id,
+              categoryId: product.category_id,
+              product: product,
+            })
+          }
+        ><View style={styles.imageBigView}>
         {image != null && image != "" ? (
           <Image
             style={styles.imageCover}
@@ -74,6 +197,7 @@ export const ProdutListcard = ({ product = {} }) => {
         )}
 
       </View>
+      </TouchableOpacity>
 
       <View style={styles.containerRow}>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -90,8 +214,42 @@ export const ProdutListcard = ({ product = {} }) => {
         <View style={styles.columnColRight}>
 
           <View style={styles.buttonView} >
+            {!isInCart ? <TouchableOpacity
+              onPress={() => handleAddToCart("+", product)}
+            >
+              <Text style={styles.buttonText} >Add to Cart</Text>
+            </TouchableOpacity> : <View
+              style={{
+                ...FlatListStyles.quantityMain,
+              }}
+            >
+              <TouchableOpacity
+                style={{ ...FlatListStyles.quantityContainer }}
+                onPress={() => handleAddToCart("-", product)}
+              >
+                <Icon name="minus" size={15} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...FlatListStyles.quantityContainer,
+                  paddingHorizontal: 30,
+                }}
+              >
+                <TextComponent
 
-            <Text style={styles.buttonText}  >Add to Cart</Text>
+                  label={cartItemQty}
+                  style={{ ...FlatListStyles.itemQuantity }}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{ ...FlatListStyles.quantityContainer }}
+                onPress={() => handleAddToCart("+", product)}
+              >
+                <Icon name="plus" size={15} color="#fff" />
+              </TouchableOpacity>
+            </View>}
+
 
           </View>
 
@@ -156,11 +314,14 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: 'normal',
     color: '#ffffff',
     textAlign: 'center',
-    padding: 10
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 10,
+    paddingRight: 10
   },
   input: {
     fontSize: 18,

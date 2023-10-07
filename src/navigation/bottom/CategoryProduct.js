@@ -51,7 +51,7 @@ export const CategoryProduct = () => {
         options={({ route }) => ({
           headerShown: true,
           headerMode :'screen',
-           
+          headerTitle: 'Back'
         })}
       /> 
     </CategoryProductStack.Navigator>
